@@ -14,9 +14,9 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _animation;
+class _HomeScreenState extends State<HomeScreen> {
+  final Color _primaryColor = Color(0xFF6A11CB);
+  final Color _secondaryColor = Color(0xFF8E2DE2); // Gradasi ungu
 
   @override
   void initState() {
@@ -24,167 +24,245 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light,
       ),
     );
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 800),
-    );
-
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
-
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final features = [
-      _FeatureData('Mulai Quiz', Icons.quiz, [Color(0xFFFF416C), Color(0xFFFF4B2B)], () => Navigator.push(context, MaterialPageRoute(builder: (context) => QuizScreen()))),
-      _FeatureData('Quiz English', Icons.language, [Color(0xFF0575E6), Color(0xFF021B79)], () => Navigator.push(context, MaterialPageRoute(builder: (context) => QuizAPIScreen()))),
-      _FeatureData('Scan QR Code', Icons.qr_code_scanner, [Color(0xFF0F2027), Color(0xFF2C5364)], () => Navigator.push(context, MaterialPageRoute(builder: (context) => ScanQrCodeScreen()))),
-      _FeatureData('Riwayat Skor', Icons.history, [Color(0xFFF7971E), Color(0xFFFFD200)], () => Navigator.push(context, MaterialPageRoute(builder: (context) => HistoryScreen()))),
-      _FeatureData('Input Soal', Icons.edit_note, [Color(0xFF8E2DE2), Color(0xFF4A00E0)], () => Navigator.push(context, MaterialPageRoute(builder: (context) => InputQuestionScreen()))),
-      _FeatureData('List Soal', Icons.list_alt, [Color(0xFFDA22FF), Color(0xFF9733EE)], () => Navigator.push(context, MaterialPageRoute(builder: (context) => ListQuestionScreen()))),
-    ];
-
     return Scaffold(
-      backgroundColor: Color(0xFFF0F2F5),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 180,
-            floating: false,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Quiz Ganesha',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      blurRadius: 8,
-                      color: Colors.black26,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [_primaryColor, _secondaryColor],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Quiz Ganesha',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.logout, color: Colors.white),
+                      onPressed: () async {
+                        await AuthService().logout();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => LoginScreen()),
+                        );
+                      },
                     ),
                   ],
                 ),
               ),
-              centerTitle: true,
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+              SizedBox(height: 8),
+              Text(
+                'Pilih quiz yang ingin kamu kerjakan',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white.withOpacity(0.9),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // Main Content
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Quiz Buttons
+                      _buildMainButton(
+                        context,
+                        icon: Icons.quiz,
+                        label: 'Kuis Bahasa Indonesia',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => QuizScreen()),
+                        ),
+                        color: Colors.deepPurple,
+                      ),
+                      SizedBox(height: 12),
+                      _buildMainButton(
+                        context,
+                        icon: Icons.language,
+                        label: 'Quiz Bahasa Inggris',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => QuizAPIScreen()),
+                        ),
+                        color: Colors.purpleAccent,
+                      ),
+                      SizedBox(height: 24),
+
+                      // Grid Menu
+                      Expanded(
+                        child: GridView.count(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1,
+                          children: [
+                            _buildGridButton(
+                              icon: Icons.qr_code_scanner,
+                              label: 'Scan QR Code',
+                              color: Colors.redAccent,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => ScanQrCodeScreen()),
+                              ),
+                            ),
+                            _buildGridButton(
+                              icon: Icons.history,
+                              label: 'Riwayat Skor',
+                              color: Colors.teal,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => HistoryScreen()),
+                              ),
+                            ),
+                            _buildGridButton(
+                              icon: Icons.edit_note,
+                              label: 'Input Soal',
+                              color: Colors.orangeAccent,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => InputQuestionScreen()),
+                              ),
+                            ),
+                            _buildGridButton(
+                              icon: Icons.list_alt,
+                              label: 'List Soal',
+                              color: Colors.indigo,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => ListQuestionScreen()),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.logout, color: Colors.white),
-                onPressed: () async {
-                  await AuthService().logout();
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-                },
-                tooltip: 'Logout',
-              ),
             ],
           ),
-          SliverPadding(
-            padding: EdgeInsets.all(16),
-            sliver: SliverGrid.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1,
-              ),
-              itemCount: features.length,
-              itemBuilder: (context, index) {
-                return ScaleTransition(
-                  scale: _animation,
-                  child: _FeatureCard(feature: features[index]),
-                );
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
-}
 
-class _FeatureData {
-  final String title;
-  final IconData icon;
-  final List<Color> gradientColors;
-  final VoidCallback onTap;
-
-  _FeatureData(this.title, this.icon, this.gradientColors, this.onTap);
-}
-
-class _FeatureCard extends StatelessWidget {
-  final _FeatureData feature;
-
-  const _FeatureCard({required this.feature});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMainButton(BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required Color color,
+  }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: feature.onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: feature.gradientColors,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: feature.gradientColors[1].withOpacity(0.3),
-                blurRadius: 8,
-                offset: Offset(0, 4),
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withOpacity(0.4)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: Colors.white),
+              ),
+              SizedBox(width: 16),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
               ),
             ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white.withOpacity(0.15),
-                  radius: 28,
-                  child: Icon(feature.icon, color: Colors.white, size: 28),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGridButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required Color color,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  feature.title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
+                child: Icon(icon, color: color, size: 28),
+              ),
+              SizedBox(height: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
