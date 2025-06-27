@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
             begin: Alignment.topLeft,
@@ -60,9 +60,16 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
+                // Ikon Ilustrasi Pertanyaan
+                Icon(
+                  Icons.animation,
+                  size: 80,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 12),
                 Text(
                   'Quiz Ganesha',
                   style: TextStyle(
@@ -72,17 +79,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     letterSpacing: 1.2,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   'Masuk untuk memulai tantangan!',
                   style: TextStyle(fontSize: 16, color: Colors.white70),
                 ),
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
                 Card(
                   elevation: 10,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -94,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         TextField(
                           controller: passwordController,
                           obscureText: true,
@@ -104,20 +111,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
-                        SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         SizedBox(
                           width: double.infinity,
                           child: _isLoading
                               ? Center(child: CircularProgressIndicator(color: themeColor))
                               : ElevatedButton.icon(
-  
+                                  icon: Icon(Icons.login, color: Colors.white),
                                   label: Text(
                                     'Login',
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: themeColor,
-                                    padding: EdgeInsets.symmetric(vertical: 14),
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -125,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   onPressed: _handleLogin,
                                 ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         TextButton(
                           onPressed: () => Navigator.push(
                             context,

@@ -49,7 +49,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _showMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.info_outline, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(child: Text(msg)),
+          ],
+        ),
+        backgroundColor: Colors.deepPurple,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -64,58 +76,95 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final themeColor = Colors.deepPurple;
 
     return Scaffold(
-      backgroundColor: themeColor.shade50,
-      appBar: AppBar(
-        backgroundColor: themeColor,
-        title: Text("Registrasi", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Card(
-          margin: EdgeInsets.all(24),
-          elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: _isLoading
-                ? CircularProgressIndicator()
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text("Buat Akun Baru",
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: themeColor)),
-                      SizedBox(height: 20),
-                      TextField(
-                        controller: usernameController,
-                        decoration: InputDecoration(
-                          labelText: "Username",
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextField(
-                        controller: passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: "Password",
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                      ),
-                      SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _register,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: themeColor,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: Text("Daftar", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                        ),
-                      )
-                    ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                Text(
+                  'Daftar Akun',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
                   ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Isi data untuk membuat akun baru',
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
+                ),
+                SizedBox(height: 32),
+                Card(
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: usernameController,
+                          decoration: InputDecoration(
+                            labelText: 'Username',
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: Icon(Icons.lock),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                        SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: _isLoading
+                              ? Center(child: CircularProgressIndicator(color: themeColor))
+                              : ElevatedButton.icon(
+                                  icon: Icon(Icons.app_registration, color: Colors.white),
+                                  label: Text(
+                                    'Daftar',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: themeColor,
+                                    padding: EdgeInsets.symmetric(vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: _register,
+                                ),
+                        ),
+                        SizedBox(height: 12),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Sudah punya akun? Login di sini',
+                            style: TextStyle(color: themeColor),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

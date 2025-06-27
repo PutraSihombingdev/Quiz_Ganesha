@@ -16,7 +16,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final Color _primaryColor = Color(0xFF6A11CB);
-  final Color _secondaryColor = Color(0xFF8E2DE2); // Gradasi ungu
+  final Color _secondaryColor = Color(0xFF8E2DE2);
+   // Gradasi ungu
 
   @override
   void initState() {
@@ -49,14 +50,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Quiz Ganesha',
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+ShaderMask(
+  shaderCallback: (bounds) => LinearGradient(
+    colors: [Colors.white, Colors.purple.shade100],
+  ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+  child: Text(
+    'Quiz Ganesha',
+    style: TextStyle(
+      fontSize: 30,
+      fontWeight: FontWeight.w900,
+      color: Colors.white, // ini akan di-mask oleh ShaderMask
+      shadows: [
+        Shadow(
+          blurRadius: 4,
+          color: Colors.black26,
+          offset: Offset(1, 2),
+        ),
+      ],
+      letterSpacing: 1.5,
+    ),
+  ),
+),
+
                     IconButton(
                       icon: Icon(Icons.logout, color: Colors.white),
                       onPressed: () async {

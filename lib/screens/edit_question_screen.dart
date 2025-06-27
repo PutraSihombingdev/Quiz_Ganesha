@@ -68,66 +68,154 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
     Navigator.pop(context);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Soal', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.deepPurple,
-        centerTitle: true,
+  Widget buildTextField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: Colors.deepPurple),
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.deepPurple, width: 2),
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(16),
-              child: Card(
-                elevation: 5,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      _buildTextField('Soal', questionController),
-                      SizedBox(height: 16),
-                      _buildTextField('Pilihan A', optionAController),
-                      SizedBox(height: 16),
-                      _buildTextField('Pilihan B', optionBController),
-                      SizedBox(height: 16),
-                      _buildTextField('Pilihan C', optionCController),
-                      SizedBox(height: 16),
-                      _buildTextField('Jawaban Benar', answerController),
-                      SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _updateQuestion,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
-                            padding: EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: Text(
-                            'Update Soal',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(fontWeight: FontWeight.w600),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+  @override
+  Widget build(BuildContext context) {
+    final themeColor = Color(0xFF6A11CB);
+
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: Column(
+        children: [
+          // ✅ Custom Header Mirip InputQuestionScreen
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(top: 48, left: 16, right: 16, bottom: 24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6A11CB), Color(0xFF8E2DE2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
+              ),
+            ),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Edit Soal',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Perbarui pertanyaan yang sudah ada',
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // ✅ Form Edit
+          Expanded(
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator(color: themeColor))
+                : SingleChildScrollView(
+                    padding: EdgeInsets.all(20),
+                    child: Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Edit data soal berikut:',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: themeColor,
+                              ),
+                            ),
+                            SizedBox(height: 20),
+
+                            // Kolom Soal
+                            TextField(
+                              controller: questionController,
+                              maxLines: 5,
+                              decoration: InputDecoration(
+                                labelText: 'Isi Soal',
+                                alignLabelWithHint: true,
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: themeColor, width: 2),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: 20),
+                            buildTextField('Pilihan A', optionAController),
+                            buildTextField('Pilihan B', optionBController),
+                            buildTextField('Pilihan C', optionCController),
+                            buildTextField('Jawaban Benar', answerController),
+
+                            SizedBox(height: 28),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                icon: Icon(Icons.save),
+                                label: Text(
+                                  'Simpan Perubahan',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: themeColor,
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                onPressed: _updateQuestion,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
       ),
     );
   }
