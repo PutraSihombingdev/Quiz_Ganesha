@@ -1,3 +1,4 @@
+/// Model data untuk soal kuis dari API, berisi pertanyaan, pilihan jawaban, dan jawaban benar.
 class QuestionAPI {
   final String question;
   final List<String> options;
