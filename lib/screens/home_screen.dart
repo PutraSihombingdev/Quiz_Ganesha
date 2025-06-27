@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quiz_ganesha/screens/quiz_api_screen.dart';
 import 'quiz_screen.dart';
-import 'leaderboad_screen.dart';
+import 'riwayat_skor_screen.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'input_question_screen.dart';

@@ -64,10 +64,12 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: Colors.deepPurple),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.deepPurple),
-            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.deepPurple, width: 2),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
       ),
@@ -76,48 +78,135 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeColor = Color(0xFF6A11CB);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Tambah Soal',style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Silakan isi form berikut:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 20),
-                  buildTextField('Soal', questionController),
-                  buildTextField('Pilihan A', optionAController),
-                  buildTextField('Pilihan B', optionBController),
-                  buildTextField('Pilihan C', optionCController),
-                  buildTextField('Jawaban Benar', answerController),
-                  SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.save),
-                      label: Text('Simpan Soal'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: _saveQuestion,
-                    ),
-                  ),
-                ],
+      backgroundColor: Colors.grey[100],
+      body: Column(
+        children: [
+          // Custom AppBar Header
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(top: 48, left: 16, right: 16, bottom: 24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6A11CB), Color(0xFF8E2DE2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
               ),
             ),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Input Soal',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Tambahkan pertanyaan ke dalam kuis',
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Form Input
+          Expanded(
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator(color: themeColor))
+                : SingleChildScrollView(
+                    padding: EdgeInsets.all(20),
+                    child: Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Lengkapi data soal berikut:',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: themeColor,
+                              ),
+                            ),
+                            SizedBox(height: 20),
+
+                            // Kolom Soal
+                            TextField(
+                              controller: questionController,
+                              maxLines: 5,
+                              decoration: InputDecoration(
+                                labelText: 'Isi Soal',
+                                alignLabelWithHint: true,
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: themeColor, width: 2),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: 20),
+                            buildTextField('Pilihan A', optionAController),
+                            buildTextField('Pilihan B', optionBController),
+                            buildTextField('Pilihan C', optionCController),
+                            buildTextField('Jawaban Benar', answerController),
+
+                            SizedBox(height: 28),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                icon: Icon(Icons.save),
+                                label: Text(
+                                  'Simpan Soal',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: themeColor,
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                onPressed: _saveQuestion,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
