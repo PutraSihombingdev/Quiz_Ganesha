@@ -1,7 +1,7 @@
 ## 📱 Aplikasi Quiz Ganesha
 
 🔗 **File APK**:  
-👉 [Download APK](https://github.com/PutraSihombingdev/Quiz_Ganesha/blob/main/release_apk/app-release.apk)
+👉 [Download APK](https://github.com/PutraSihombingdev/Quiz_Ganesha/blob/main/release_apk/app-release.apk) (klik view raw)
 
 
 Tampilan Aplikasi
