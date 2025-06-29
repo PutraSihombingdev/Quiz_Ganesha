@@ -21,9 +21,24 @@ class _ListQuestionScreenState extends State<ListQuestionScreen> {
     await db.delete('questions', where: 'id = ?', whereArgs: [id]);
     _loadQuestions();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Soal berhasil dihapus')),
-    );
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: Row(
+      children: [
+        Icon(Icons.delete_outline, color: Colors.white),
+        SizedBox(width: 10),
+        Expanded(child: Text('Soal berhasil dihapus')),
+      ],
+    ),
+    backgroundColor: Colors.redAccent,
+    behavior: SnackBarBehavior.floating,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    elevation: 6,
+    margin: EdgeInsets.all(16),
+    duration: Duration(seconds: 2),
+  ),
+);
+
   }
 
   void _confirmDelete(int id) {

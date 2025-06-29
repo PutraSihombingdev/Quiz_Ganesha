@@ -1,186 +1,216 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import '../services/db_helper.dart';
+  import 'dart:io';
+  import 'package:flutter/material.dart';
+  import 'package:image_picker/image_picker.dart';
+  import '../services/db_helper.dart';
 
-class InputQuestionScreen extends StatefulWidget {
-  @override
-  _InputQuestionScreenState createState() => _InputQuestionScreenState();
-}
-
-class _InputQuestionScreenState extends State<InputQuestionScreen> {
-  final questionController = TextEditingController();
-  final optionAController = TextEditingController();
-  final optionBController = TextEditingController();
-  final optionCController = TextEditingController();
-  final answerController = TextEditingController();
-
-  bool _isLoading = false;
-  File? _selectedImage;
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _selectedImage = File(picked.path);
-      });
-    }
+  class InputQuestionScreen extends StatefulWidget {
+    @override
+    _InputQuestionScreenState createState() => _InputQuestionScreenState();
   }
 
-  void _saveQuestion() async {
-    if (questionController.text.isEmpty ||
-        optionAController.text.isEmpty ||
-        optionBController.text.isEmpty ||
-        optionCController.text.isEmpty ||
-        answerController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Semua field wajib diisi!')),
-      );
-      return;
+  class _InputQuestionScreenState extends State<InputQuestionScreen> {
+    final questionController = TextEditingController();
+    final optionAController = TextEditingController();
+    final optionBController = TextEditingController();
+    final optionCController = TextEditingController();
+    final answerController = TextEditingController();
+
+    bool _isLoading = false;
+    File? _selectedImage;
+
+    Future<void> _pickImage() async {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.gallery);
+      if (picked != null) {
+        setState(() {
+          _selectedImage = File(picked.path);
+        });
+      }
     }
 
-    setState(() => _isLoading = true);
+    void _saveQuestion() async {
+      if (questionController.text.isEmpty ||
+          optionAController.text.isEmpty ||
+          optionBController.text.isEmpty ||
+          optionCController.text.isEmpty ||
+          answerController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Semua field wajib diisi!')),
+        );
+        return;
+      }
 
-    try {
-      final db = await DBHelper().db;
-      await db.insert('questions', {
-        'question': questionController.text.trim(),
-        'optionA': optionAController.text.trim(),
-        'optionB': optionBController.text.trim(),
-        'optionC': optionCController.text.trim(),
-        'answer': answerController.text.trim(),
-        'imagePath': _selectedImage?.path,
-      });
+      setState(() => _isLoading = true);
 
-      setState(() => _isLoading = false);
+      try {
+        final db = await DBHelper().db;
+        await db.insert('questions', {
+          'question': questionController.text.trim(),
+          'optionA': optionAController.text.trim(),
+          'optionB': optionBController.text.trim(),
+          'optionC': optionCController.text.trim(),
+          'answer': answerController.text.trim(),
+          'imagePath': _selectedImage?.path,
+        });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Soal berhasil disimpan')),
-      );
+        setState(() => _isLoading = false);
 
-      Navigator.pop(context);
-    } catch (e) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal menyimpan soal: $e')),
-      );
-    }
-  }
-
-  Widget buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          filled: true,
-          fillColor: Colors.grey[100],
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        ),
-      ),
-    );
-  }
-
-  Widget buildMultilineTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextField(
-        controller: controller,
-        minLines: 3,
-        maxLines: 10,
-        decoration: InputDecoration(
-          labelText: label,
-          filled: true,
-          fillColor: Colors.grey[100],
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final themeColor = Color(0xFF6A11CB);
-
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: Column(
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Row(
         children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.only(top: 48, left: 16, right: 16, bottom: 24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF6A11CB), Color(0xFF8E2DE2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(24),
-                bottomRight: Radius.circular(24),
-              ),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Input Soal',
-                      style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    Text('Tambahkan pertanyaan ke kuis', style: TextStyle(color: Colors.white70)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        buildMultilineTextField('Soal', questionController),
-                        buildTextField('Pilihan A', optionAController),
-                        buildTextField('Pilihan B', optionBController),
-                        buildTextField('Pilihan C', optionCController),
-                        buildTextField('Jawaban Benar', answerController),
-                        SizedBox(height: 12),
-                        ElevatedButton.icon(
-                          icon: Icon(Icons.image),
-                          label: Text("Pilih Gambar"),
-                          onPressed: _pickImage,
-                        ),
-                        if (_selectedImage != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Image.file(_selectedImage!, height: 150),
-                          ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _saveQuestion,
-                          child: Text("Simpan Soal"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: themeColor,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-          ),
+          Icon(Icons.check_circle_outline, color: Colors.white),
+          SizedBox(width: 10),
+          Expanded(child: Text('Soal berhasil disimpan')),
         ],
       ),
-    );
+      backgroundColor: Colors.green,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 6,
+      margin: EdgeInsets.all(16),
+      duration: Duration(seconds: 2),
+    ),
+  );
+
+
+        Navigator.pop(context);
+      } catch (e) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Row(
+        children: [
+          Icon(Icons.error_outline, color: Colors.white),
+          SizedBox(width: 10),
+          Expanded(child: Text('Gagal menyimpan soal: $e')),
+        ],
+      ),
+      backgroundColor: Colors.redAccent,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: EdgeInsets.all(16),
+      elevation: 6,
+      duration: Duration(seconds: 3),
+    ),
+  );
+
+      }
+    }
+
+    Widget buildTextField(String label, TextEditingController controller) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+      );
+    }
+
+    Widget buildMultilineTextField(String label, TextEditingController controller) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: TextField(
+          controller: controller,
+          minLines: 3,
+          maxLines: 10,
+          decoration: InputDecoration(
+            labelText: label,
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+      );
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      final themeColor = Color(0xFF6A11CB);
+
+      return Scaffold(
+        backgroundColor: Colors.grey[100],
+        body: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(top: 48, left: 16, right: 16, bottom: 24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF6A11CB), Color(0xFF8E2DE2)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Input Soal',
+                        style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      Text('Tambahkan pertanyaan ke kuis', style: TextStyle(color: Colors.white70)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          buildMultilineTextField('Soal', questionController),
+                          buildTextField('Pilihan A', optionAController),
+                          buildTextField('Pilihan B', optionBController),
+                          buildTextField('Pilihan C', optionCController),
+                          buildTextField('Jawaban Benar', answerController),
+                          SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            icon: Icon(Icons.image),
+                            label: Text("Pilih Gambar"),
+                            onPressed: _pickImage,
+                          ),
+                          if (_selectedImage != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Image.file(_selectedImage!, height: 150),
+                            ),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: _saveQuestion,
+                            child: Text("Simpan Soal"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: themeColor,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      );
+    }
   }
-}
