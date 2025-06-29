@@ -11,58 +11,59 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final passwordController = TextEditingController();
   bool _isLoading = false;
 
-  void _register() async {
-    final username = usernameController.text.trim();
-    final password = passwordController.text.trim();
+void _register() async {
+  final username = usernameController.text.trim();
+  final password = passwordController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      _showMessage("Username dan Password tidak boleh kosong");
-      return;
-    }
+  if (username.isEmpty || password.isEmpty) {
+    _showMessage("Username dan Password tidak boleh kosong");
+    return;
+  }
 
-    if (password.length < 4) {
-      _showMessage("Password minimal 4 karakter");
-      return;
-    }
+  if (password.length < 4) {
+    _showMessage("Password minimal 4 karakter");
+    return;
+  }
 
-    setState(() => _isLoading = true);
+  setState(() => _isLoading = true);
 
-    final db = await DBHelper().db;
-    final existing = await db.query('users', where: 'username = ?', whereArgs: [username]);
+  final db = await DBHelper().db;
+  final existing = await db.query('users', where: 'username = ?', whereArgs: [username]);
 
-    if (existing.isNotEmpty) {
-      _showMessage("Username sudah digunakan");
-      setState(() => _isLoading = false);
-      return;
-    }
-
-    await db.insert('users', {
-      'username': username,
-      'password': password,
-      'score': 0,
-      'timestamp': DateTime.now().toIso8601String(),
-    });
-
+  if (existing.isNotEmpty) {
+    _showMessage("Username sudah digunakan");
     setState(() => _isLoading = false);
-    _showMessage("Registrasi berhasil, silakan login");
-    Navigator.pop(context);
+    return;
   }
 
-  void _showMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.info_outline, color: Colors.white),
-            SizedBox(width: 8),
-            Expanded(child: Text(msg)),
-          ],
-        ),
-        backgroundColor: Colors.redAccent,
-        behavior: SnackBarBehavior.floating,
+  await db.insert('users', {
+    'username': username,
+    'password': password,
+    'score': 0,
+    'timestamp': DateTime.now().toIso8601String(),
+  });
+
+  setState(() => _isLoading = false);
+  _showMessage("Registrasi berhasil, silakan login", color: Colors.green);
+  Navigator.pop(context);
+}
+
+
+void _showMessage(String msg, {Color color = Colors.redAccent}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Row(
+        children: [
+          const SizedBox(width: 8),
+          Expanded(child: Text(msg)),
+        ],
       ),
-    );
-  }
+      backgroundColor: color,
+      behavior: SnackBarBehavior.floating,
+    ),
+  );
+}
+
 
   @override
   void dispose() {

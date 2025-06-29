@@ -66,8 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Ikon Ilustrasi Pertanyaan
                     Image.network(
                       'https://sdmntpreastus.oaiusercontent.com/files/00000000-1a48-61f9-8b7c-efdb2a25791c/raw?se=2025-06-29T16%3A13%3A34Z&sp=r&sv=2024-08-04&sr=b&scid=73253820-bffd-545a-addc-471819a6e058&skoid=a3412ad4-1a13-47ce-91a5-c07730964f35&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-28T19%3A13%3A41Z&ske=2025-06-29T19%3A13%3A41Z&sks=b&skv=2024-08-04&sig=F/RpaB%2Bclnf6ivco4QtJt80JnA6Mr//hVjqPURDUR/8%3D', // ganti URL sesuai kebutuhanmu
-                      width: 300,
-                      height: 50,
+                      width: 350,
+                      height: 300,
                       errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image, size: 110, color: Colors.white),
                     ),
 
