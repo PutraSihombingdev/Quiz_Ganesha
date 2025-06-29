@@ -1,31 +1,30 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-
-/// DBHelpe class utilitas untuk mengelola koneksi dan inisialisasi database SQLite.
+/// DBHelper adalah class utilitas untuk mengelola koneksi dan struktur database SQLite.
 class DBHelper {
   static Database? _db;
 
-  /// Getter untuk mendapatkan instance database.
-  /// Akan menginisialisasi database jika belum ada.
+  /// Getter untuk mendapatkan instance database. Inisialisasi jika belum ada.
   Future<Database> get db async {
     if (_db != null) return _db!;
     _db = await initDb();
     return _db!;
   }
 
-  /// Inisialisasi database dan return objek `Database`.
-  /// Database dibuat di path default perangkat dengan nama 'quiz_pintar.db'.
+  /// Inisialisasi database: membuat database baru atau membuka yang sudah ada.
   initDb() async {
     String path = join(await getDatabasesPath(), 'quiz_pintar.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3, // Versi dinaikkan untuk memastikan kolom baru terbuat
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
-  /// Fungsi yang menyimpan tabel pengguna dan pertanyaan
-  _onCreate(Database db, int version) async {
+
+  /// Membuat tabel saat database pertama kali dibuat.
+  Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,14 +42,19 @@ class DBHelper {
         optionA TEXT,
         optionB TEXT,
         optionC TEXT,
-        answer TEXT
+        answer TEXT,
+        imagePath TEXT
       )
     ''');
   }
-  /// Fungsi untuk menangani migrasi database jika terjadi perubahan versi.
-  _onUpgrade(Database db, int oldVersion, int newVersion) async {
+
+  /// Menangani perubahan versi database dan menambahkan kolom baru jika dibutuhkan.
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE users ADD COLUMN timestamp TEXT');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE questions ADD COLUMN imagePath TEXT');
     }
   }
 }

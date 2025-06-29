@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/db_helper.dart';
 
 class EditQuestionScreen extends StatefulWidget {
@@ -19,6 +21,8 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
   late TextEditingController answerController;
 
   bool _isLoading = false;
+  File? _selectedImage;
+  String? _imagePath;
 
   @override
   void initState() {
@@ -28,14 +32,26 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
     optionBController = TextEditingController(text: widget.questionData['optionB']);
     optionCController = TextEditingController(text: widget.questionData['optionC']);
     answerController = TextEditingController(text: widget.questionData['answer']);
+    _imagePath = widget.questionData['imagePath'];
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _selectedImage = File(picked.path);
+        _imagePath = picked.path;
+      });
+    }
   }
 
   void _updateQuestion() async {
-    if (questionController.text.isEmpty ||
-        optionAController.text.isEmpty ||
-        optionBController.text.isEmpty ||
-        optionCController.text.isEmpty ||
-        answerController.text.isEmpty) {
+    if (questionController.text.trim().isEmpty ||
+        optionAController.text.trim().isEmpty ||
+        optionBController.text.trim().isEmpty ||
+        optionCController.text.trim().isEmpty ||
+        answerController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Semua field wajib diisi!')),
       );
@@ -53,6 +69,7 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
         'optionB': optionBController.text.trim(),
         'optionC': optionCController.text.trim(),
         'answer': answerController.text.trim(),
+        'imagePath': _imagePath, // Simpan path baru
       },
       where: 'id = ?',
       whereArgs: [widget.questionData['id']],
@@ -62,7 +79,7 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
     setState(() => _isLoading = false);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Soal berhasil diupdate')),
+      SnackBar(content: Text('Soal berhasil diperbarui')),
     );
 
     Navigator.pop(context);
@@ -96,7 +113,6 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
       backgroundColor: Colors.grey[100],
       body: Column(
         children: [
-          //  Custom Header Mirip InputQuestionScreen
           Container(
             width: double.infinity,
             padding: EdgeInsets.only(top: 48, left: 16, right: 16, bottom: 24),
@@ -139,7 +155,7 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
             ),
           ),
 
-          // ✅ Form Edit
+          // Form
           Expanded(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator(color: themeColor))
@@ -154,7 +170,7 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Edit data soal berikut:',
+                              'Edit Data Soal:',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -162,8 +178,6 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
                               ),
                             ),
                             SizedBox(height: 20),
-
-                            // Kolom Soal
                             TextField(
                               controller: questionController,
                               maxLines: 5,
@@ -176,19 +190,31 @@ class _EditQuestionScreenState extends State<EditQuestionScreen> {
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: themeColor, width: 2),
+                                  borderSide: BorderSide(color: themeColor, width: 2),
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
                             ),
-
                             SizedBox(height: 20),
                             buildTextField('Pilihan A', optionAController),
                             buildTextField('Pilihan B', optionBController),
                             buildTextField('Pilihan C', optionCController),
                             buildTextField('Jawaban Benar', answerController),
 
+                            SizedBox(height: 20),
+                            ElevatedButton.icon(
+                              label: Text(
+                                  "Ganti Gambar",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              onPressed: _pickImage,
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+                            ),
+                            if (_imagePath != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: Image.file(File(_imagePath!), height: 150),
+                              ),
                             SizedBox(height: 28),
                             SizedBox(
                               width: double.infinity,

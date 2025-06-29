@@ -6,6 +6,7 @@ class Question {
   String optionB;
   String optionC;
   String answer;
+  String? imagePath;
 
   Question({this.id, required this.question, required this.optionA, required this.optionB, required this.optionC, required this.answer});
 
@@ -18,6 +19,7 @@ class Question {
       'optionB': optionB,
       'optionC': optionC,
       'answer': answer,
+      'imagePath': imagePath,
     };
   }
 }

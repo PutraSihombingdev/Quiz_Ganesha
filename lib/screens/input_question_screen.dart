@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/db_helper.dart';
 
 class InputQuestionScreen extends StatefulWidget {
@@ -14,6 +16,17 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
   final answerController = TextEditingController();
 
   bool _isLoading = false;
+  File? _selectedImage;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _selectedImage = File(picked.path);
+      });
+    }
+  }
 
   void _saveQuestion() async {
     if (questionController.text.isEmpty ||
@@ -31,13 +44,13 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
 
     try {
       final db = await DBHelper().db;
-
       await db.insert('questions', {
         'question': questionController.text.trim(),
         'optionA': optionAController.text.trim(),
         'optionB': optionBController.text.trim(),
         'optionC': optionCController.text.trim(),
         'answer': answerController.text.trim(),
+        'imagePath': _selectedImage?.path,
       });
 
       setState(() => _isLoading = false);
@@ -49,7 +62,6 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
       Navigator.pop(context);
     } catch (e) {
       setState(() => _isLoading = false);
-      debugPrint('❌ Error menyimpan soal: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal menyimpan soal: $e')),
       );
@@ -63,14 +75,9 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.deepPurple),
           filled: true,
           fillColor: Colors.grey[100],
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.deepPurple, width: 2),
-            borderRadius: BorderRadius.circular(14),
-          ),
         ),
       ),
     );
@@ -84,7 +91,6 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
       backgroundColor: Colors.grey[100],
       body: Column(
         children: [
-          // Custom AppBar Header
           Container(
             width: double.infinity,
             padding: EdgeInsets.only(top: 48, left: 16, right: 16, bottom: 24),
@@ -111,97 +117,48 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
                   children: [
                     Text(
                       'Input Soal',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                      'Tambahkan pertanyaan ke dalam kuis',
-                      style: TextStyle(color: Colors.white70, fontSize: 13),
-                    ),
+                    Text('Tambahkan pertanyaan ke kuis', style: TextStyle(color: Colors.white70)),
                   ],
                 ),
               ],
             ),
           ),
-
-          // Form Input
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: themeColor))
+                ? Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
                     padding: EdgeInsets.all(20),
-                    child: Card(
-                      elevation: 8,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Lengkapi data soal berikut:',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: themeColor,
-                              ),
-                            ),
-                            SizedBox(height: 20),
-
-                            // Kolom Soal
-                            TextField(
-                              controller: questionController,
-                              maxLines: 5,
-                              decoration: InputDecoration(
-                                labelText: 'Isi Soal',
-                                alignLabelWithHint: true,
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: themeColor, width: 2),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: 20),
-                            buildTextField('Pilihan A', optionAController),
-                            buildTextField('Pilihan B', optionBController),
-                            buildTextField('Pilihan C', optionCController),
-                            buildTextField('Jawaban Benar', answerController),
-
-                            SizedBox(height: 28),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                icon: Icon(Icons.save),
-                                label: Text(
-                                  'Simpan Soal',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: themeColor,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                ),
-                                onPressed: _saveQuestion,
-                              ),
-                            ),
-                          ],
+                    child: Column(
+                      children: [
+                        buildTextField('Soal', questionController),
+                        buildTextField('Pilihan A', optionAController),
+                        buildTextField('Pilihan B', optionBController),
+                        buildTextField('Pilihan C', optionCController),
+                        buildTextField('Jawaban Benar', answerController),
+                        SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          icon: Icon(Icons.image),
+                          label: Text("Pilih Gambar"),
+                          onPressed: _pickImage,
                         ),
-                      ),
+                        if (_selectedImage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Image.file(_selectedImage!, height: 150),
+                          ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: _saveQuestion,
+                          child: Text("Simpan Soal"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: themeColor,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+                          ),
+                        )
+                      ],
                     ),
                   ),
           ),
