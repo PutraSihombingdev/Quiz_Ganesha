@@ -29,23 +29,15 @@ class _ScanQrCodeScreenState extends State<ScanQrCodeScreen> {
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal membuka link')),
-        );
+        _showSnack('Gagal membuka link');
       }
-
-      // Tunggu lalu izinkan scan ulang
-      await Future.delayed(Duration(seconds: 2));
-      controller.start();
-      setState(() => _hasScanned = false);
     } else {
-      // Tampilkan dialog untuk isi QR selain link
       if (!context.mounted) return;
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: Text("Isi QR Code"),
-          content: Text(code),
+          title: Text("Hasil Scan"),
+          content: Text(code, style: TextStyle(fontSize: 16)),
           actions: [
             TextButton(
               onPressed: () {
@@ -59,6 +51,19 @@ class _ScanQrCodeScreenState extends State<ScanQrCodeScreen> {
         ),
       );
     }
+
+    await Future.delayed(Duration(seconds: 2));
+    controller.start();
+    setState(() => _hasScanned = false);
+  }
+
+  void _showSnack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: Colors.deepPurple,
+      ),
+    );
   }
 
   @override
@@ -70,28 +75,95 @@ class _ScanQrCodeScreenState extends State<ScanQrCodeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('QR Scanner')),
-      body: Stack(
+      body: Column(
         children: [
-          MobileScanner(
-            controller: controller,
-            onDetect: (BarcodeCapture capture) {
-              final barcode = capture.barcodes.first;
-              final String? code = barcode.rawValue;
-              if (code != null) {
-                _handleScan(code);
-              }
-            },
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              color: Colors.black54,
-              padding: EdgeInsets.all(12),
-              child: Text(
-                'Arahkan kamera ke QR Code',
-                style: TextStyle(color: Colors.white),
+          // HEADER
+          Container(
+            padding: EdgeInsets.only(top: 48, left: 20, right: 20, bottom: 24),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6A11CB), Color(0xFF8E2DE2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
+              ),
+            ),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Icon(Icons.arrow_back, color: Colors.white),
+                ),
+                SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Scan QR Code',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Pindai QR untuk akses cepat',
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // SCANNER AREA
+          Expanded(
+            child: Stack(
+              children: [
+                MobileScanner(
+                  controller: controller,
+                  onDetect: (capture) {
+                    final code = capture.barcodes.first.rawValue;
+                    if (code != null) _handleScan(code);
+                  },
+                ),
+
+                // Frame di tengah
+                Center(
+                  child: Container(
+                    width: 240,
+                    height: 240,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                // Instruction
+                Positioned(
+                  bottom: 32,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'Arahkan kamera ke QR Code',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
