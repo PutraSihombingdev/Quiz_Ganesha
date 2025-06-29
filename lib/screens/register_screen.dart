@@ -58,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Expanded(child: Text(msg)),
           ],
         ),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.redAccent,
         behavior: SnackBarBehavior.floating,
       ),
     );
