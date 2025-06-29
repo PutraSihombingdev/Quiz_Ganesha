@@ -70,9 +70,26 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
 
   Widget buildTextField(String label, TextEditingController controller) {
     return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+      ),
+    );
+  }
+
+  Widget buildMultilineTextField(String label, TextEditingController controller) {
+    return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextField(
         controller: controller,
+        minLines: 3,
+        maxLines: 10,
         decoration: InputDecoration(
           labelText: label,
           filled: true,
@@ -132,7 +149,7 @@ class _InputQuestionScreenState extends State<InputQuestionScreen> {
                     padding: EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        buildTextField('Soal', questionController),
+                        buildMultilineTextField('Soal', questionController),
                         buildTextField('Pilihan A', optionAController),
                         buildTextField('Pilihan B', optionBController),
                         buildTextField('Pilihan C', optionCController),
