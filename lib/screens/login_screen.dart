@@ -117,7 +117,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: _isLoading
                               ? Center(child: CircularProgressIndicator(color: themeColor))
                               : ElevatedButton.icon(
-                                  icon: Icon(Icons.login, color: Colors.white),
                                   label: Text(
                                     'Login',
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),

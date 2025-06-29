@@ -136,7 +136,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: _isLoading
                               ? Center(child: CircularProgressIndicator(color: themeColor))
                               : ElevatedButton.icon(
-                                  icon: Icon(Icons.app_registration, color: Colors.white),
                                   label: Text(
                                     'Daftar',
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
